@@ -1,0 +1,19 @@
+{
+  "namespace": "org.chicago.cta.station.turnstils",
+  "type": "record",
+  "name": "value",
+  "fields": [
+    {
+      "name": "station_id",
+      "type": "int"
+    },
+    {
+      "name": "station_name",
+      "type": "string"
+    },
+    {
+      "name": "line",
+      "type": "string"
+    }
+  ]
+}
