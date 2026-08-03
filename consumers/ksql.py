@@ -12,18 +12,27 @@ logger = logging.getLogger(__name__)
 
 KSQL_URL = "http://localhost:8088"
 
-#
-#       Make sure to use 'avro' datatype!
-#       `turnstile` table and grouping on station_id.
-#       Make sure to cast the COUNT of station id to `count`
-#       Make sure to set the value format to JSON
-
 KSQL_STATEMENT = """
-CREATE TABLE TURNSTILE (station_id INT, station_name VARCHAR, line VARCHAR)
-WITH (KAFKA_TOPIC='org.chicago.cta.station.turnstiles.v1', VALUE_FORMAT='AVRO');
+CREATE TABLE TURNSTILE (
+    station_id INT,
+    station_name VARCHAR,
+    line VARCHAR
+) WITH (
+    KAFKA_TOPIC='org.chicago.cta.station.turnstiles.v1',
+    KEY='station_id',
+    KEY_FORMAT='AVRO',
+    VALUE_FORMAT='AVRO'
+);
+
 CREATE TABLE TURNSTILE_SUMMARY
-WITH (KAFKA_TOPIC='TURNSTILE_SUMMARY', VALUE_FORMAT='JSON') AS
-SELECT station_id, COUNT(*) AS COUNT FROM TURNSTILE GROUP BY station_id;
+WITH (
+    KAFKA_TOPIC='TURNSTILE_SUMMARY',
+    KEY_FORMAT='AVRO',
+    VALUE_FORMAT='JSON'
+) AS
+SELECT station_id, COUNT(*) AS count
+FROM TURNSTILE
+GROUP BY station_id;
 """
 
 
@@ -45,7 +54,6 @@ def execute_statement():
         ),
     )
 
-    # Ensure that a 2XX status code was returned
     resp.raise_for_status()
 
 
