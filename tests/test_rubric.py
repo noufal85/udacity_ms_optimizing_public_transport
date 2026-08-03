@@ -18,6 +18,20 @@ class RubricContractTests(unittest.TestCase):
             schema = json.loads((ROOT / "producers/models/schemas" / filename).read_text())
             self.assertEqual({f["name"] for f in schema["fields"]}, fields)
 
+    def test_ksql_turnstile_table_uses_station_id_as_avro_key(self):
+        statement = (ROOT / "consumers/ksql.py").read_text()
+        self.assertIn("KEY='station_id'", statement)
+        self.assertIn("KEY_FORMAT='AVRO'", statement)
+        self.assertIn("VALUE_FORMAT='AVRO'", statement)
+        self.assertIn("GROUP BY station_id", statement)
+        self.assertIn("COUNT(*) AS count", statement)
+
+    def test_turnstile_producer_uses_station_id_as_key(self):
+        producer = (ROOT / "producers/models/turnstile.py").read_text()
+        schema = json.loads((ROOT / "producers/models/schemas/turnstile_key.json").read_text())
+        self.assertEqual([field["name"] for field in schema["fields"]], ["station_id"])
+        self.assertIn('"station_id": self.station.station_id', producer)
+
     def test_required_modules_have_no_assignment_todos(self):
         paths = [
             ROOT / "producers/models/producer.py",
