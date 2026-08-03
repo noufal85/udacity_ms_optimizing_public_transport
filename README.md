@@ -13,6 +13,10 @@ Udacity Kafka ecosystem project for a Chicago Transit Authority transit-status d
 - Completed Kafka consumers for weather, stations, arrivals, and turnstile summaries.
 - Added rubric contract tests and a clean `.gitignore`.
 
+## Reviewer correction: station-keyed KSQL aggregation
+
+Turnstile events now use an Avro key containing `station_id`. The KSQL source table explicitly maps that key with `KEY='station_id'` and `KEY_FORMAT='AVRO'`. `TURNSTILE_SUMMARY` is a table grouped by `station_id`, exposing the latest aggregate count for each station.
+
 ## Project layout
 
 - `producers/` emits arrival and turnstile events, weather through Kafka REST Proxy, and station data through Kafka Connect.
